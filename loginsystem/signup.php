@@ -1,3 +1,27 @@
+<?php
+if($_SERVER["REQUEST_METHOD"]=="POST"){
+  $showerror=false;
+  $showalert=false;
+include 'partial/_dbconnect.php';
+$username=$_POST["username"];
+$password=$_POST["password"];#refrencing from the form for="username"
+$cpassword=$_POST["cpassword"];
+
+if(($password==$cpassword) && $exists=false){
+$sql="INSERT INTO `users` (`sno`, `$username`, `$password`, `dt`) 
+VALUES ('2', '$username', '$password', current_timestamp())";
+$result=mysqli_query($conn,$sql);
+if($result){
+  $showalert=true;
+}
+else{
+$showerror="password do not match";
+}
+}
+}
+
+?>
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -10,7 +34,27 @@
     <?php require 'partial/_nav.php'?>
     <div class="container">
         <h1 class="text-center">Sign up </h1>
-        <form action="/loginsystem/signup.php" method="post">
+
+        <?php 
+        if($showalert){
+         echo' 
+         <div class="alert alert-success" role="alert">
+         A simple success alert—check it out!
+       </div>';
+        }
+        ?>
+         <?php 
+        if($showerror){
+         echo' 
+         <div class="alert alert-success" role="alert">
+         '.$showerror.'
+       </div>';
+        }
+        ?>
+
+
+     
+        <form action="/loginsystem/signup.php" method="POST">
   <div class="">
     <label for="username" class="form-label">username</label>
     <input type="text" class="form-control" id="username" name="username" aria-describedby="emailHelp">
