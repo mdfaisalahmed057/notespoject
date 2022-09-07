@@ -11,13 +11,13 @@
           <a class="nav-link active" aria-current="page" href="/loginsystem/welome.php">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/loginsystem/login.php">login</a>
+          <a class="nav-link" href="../login.php">login</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="/loginsystem/logout.php">logout</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/loginsystem/signup.php">signup</a>
+          <a class="nav-link" href="../signup.php">signup</a>
         </li>
        
       <form class="d-flex" role="search">

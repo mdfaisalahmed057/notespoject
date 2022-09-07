@@ -4,7 +4,7 @@ $username="root";
 $password="";
 $database="users";#name of the collection
 
-$conn=mysqli_connect($server,$username,$password,$database);
+$conn=mysqli_connect("localhost","root","","users");
 if($conn){
     echo"success";
 }else{
