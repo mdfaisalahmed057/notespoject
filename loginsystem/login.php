@@ -1,78 +1,86 @@
 <?php
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  $login = false;
-  $showalert = false;
-  include 'partial/_dbconnect.php';
-  $username = $_POST["username"];
-  $password = $_POST["password"]; #refrencing from the form for="username"
-  header("location: welcome.php");
+$login = false;
+$showError = false;
+if($_SERVER["REQUEST_METHOD"] == "POST"){
+    include 'partial/_dbconnect.php';
+    $username = $_POST["username"];
+    $password = $_POST["password"]; 
+    
+     
+    $sql = "Select * from users where username='$username' AND password='$password'";
+    // $sql = "Select * from users where username='$username'";
+    $result = mysqli_query($conn, $sql);
+    $num = mysqli_num_rows($result);
+   if($num==1){
+    $login =true;
+    session_start();
+    $_SESSION['loggedin']=true;
+    $_SESSION['username']=$username;
+    header("location:welcom.php");
+   }
+   else{
+    $showError="invalid credential";
 
-
-  $sql = "select*from users where username='$username' AND password='$password'";
-  $result = mysqli_query($conn, $sql);
-  $num = mysqli_num_rows($result);
-  if ($num = 1) {
-    $login = true;
-    $_SESSION['loggedin'] = true;
-    $_SESSION['username'] = $username;
-    header("locaion:welcome.php");
-  } else {
-    $showerror = "invald do not match";
-  }
+   }
 }
-
+    
 ?>
 
 <!doctype html>
 <html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>login php</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
-</head>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
-<body>
-  <?php require 'partial/_nav.php' ?>
-  <div class="container">
-    <h1 class="text-center">login </h1>
-
+    <title>Login</title>
+  </head>
+  <body>
+    <?php require 'partial/_nav.php' ?>
     <?php
-    if ($showalert) {
-      echo ' 
-         <div class="alert alert-success" role="alert">
-           success alert—check it out!
-       </div>';
+    if($login){
+    echo ' <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Success!</strong> You are logged in
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div> ';
+    }
+    if($showError){
+    echo ' <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error!</strong> '. $showError.'
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div> ';
     }
     ?>
-    <?php
-    if ($login) {
-      echo ' 
-         <div class="alert alert-success" role="alert">
-         ' . $login . '
-       </div>';
-    }
-    ?>
 
+    <div class="container my-4">
+     <h1 class="text-center">Login to our website</h1>
+     <form action="./login.php" method="post">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" class="form-control" id="username" name="username" aria-describedby="emailHelp">
+            
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" id="password" name="password">
+        </div>
+       
+         
+        <button type="submit" class="btn btn-primary">Login</button>
+     </form>
+    </div>
 
-
-    <form action="/loginsystem/signup.php" method="post">
-      <div class="">
-        <label for="username" class="form-label">username</label>
-        <input type="text" class="form-control" id="username" name="username" aria-describedby="emailHelp">
-      </div>
-      <div class="mb-3">
-        <label for="password" class="form-label">Password</label>
-        <input type="password" class="form-control" id="cpassword" name="password">
-      </div>
-
-      <button type="submit" class="btn btn-primary">login</button>
-    </form>
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js" integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.min.js" integrity="sha384-ODmDIVzN+pFdexxHEHFBQH3/9/vQ9uori45z4JjnFsRydbmQbmL5t1tQ0culUzyK" crossorigin="anonymous"></script>
-</body>
-
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+  </body>
 </html>
