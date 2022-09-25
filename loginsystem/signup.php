@@ -1,85 +1,100 @@
 <?php
-// if($_SERVER["REQUEST_METHOD"]=="POST"){
+$showAlert = false;
+$showError = false;
+if($_SERVER["REQUEST_METHOD"] == "POST"){
+    include 'partial/_dbconnect.php';
+    $username = $_POST["username"];
+    $password = $_POST["password"];
+    $cpassword = $_POST["cpassword"];
+    // $exists=false;
 
-if(isset($_POST["username"])){
+    // Check whether this username exists
+    $existSql = "SELECT * FROM `users` WHERE username = '$username'";
+    $result = mysqli_query($conn, $existSql);
+    $numExistRows = mysqli_num_rows($result);
+    if($numExistRows > 0){
+        // $exists = true;
+        $showError = "Username Already Exists";
+    }
+    else{
+        // $exists = false; 
+        if(($password == $cpassword)){
+            $hash = password_hash($password, PASSWORD_DEFAULT);
+            $sql = "INSERT INTO `users` ( `username`, `password`, `dt`) VALUES ('$username', '$hash', current_timestamp())";
+            $result = mysqli_query($conn, $sql);
+            if ($result){
+                $showAlert = true;
+             
 
-  // $showerror=false;
-  // $showalert=false;
-include 'partial/_dbconnect.php';
-
-$username=$_POST["username"];
-$password=$_POST["password"];#refrencing from the form for="username"
-$cpassword=$_POST["cpassword"];
-
-
-if(($password==$cpassword) && $exists=false){
-
-$sql="INSERT INTO `users` (`sno`, `$username`, `$password`, `dt`) 
-VALUES ('2', '$username', '$password', current_timestamp())";
-
-$result=mysqli_query($conn,$sql);
-if($result){
-  $showalert=true;
+            }
+        }
+        else{
+            $showError = "Passwords do not match";
+        }
+    }
 }
-else{
-$showerror="password do not match";
-}
-}
-}
-
+    
 ?>
 
 <!doctype html>
 <html lang="en">
   <head>
+    <!-- Required meta tags -->
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>signup php</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <title>SignUp</title>
   </head>
   <body>
-    <?php require 'partial/_nav.php'?>
-    <div class="container">
-        <h1 class="text-center">Sign up </h1>
+    <?php require 'partial/_nav.php' ?>
+    <?php
+    if($showAlert){
+    echo ' <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Success!</strong> Your account is now created and you can login
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div> ';
+    }
+    if($showError){
+    echo ' <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error!</strong> '. $showError.'
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div> ';
+    }
+    ?>
 
-        <?php 
-        if($showalert){
-         echo' 
-         <div class="alert alert-success" role="alert">
-         A simple success alert—check it out!
-       </div>';
-        }
-        ?>
-         <?php 
-        if($showerror){
-         echo' 
-         <div class="alert alert-success" role="alert">
-         '.$showerror.'
-       </div>';
-        }
-        ?>
-
-        <form action="/loginsystem/signup.php" method="POST">
-     <div class="">
-    <label for="username" class="form-label">username</label>
-    <input type="text" class="form-control" id="username" name="username" aria-describedby="emailHelp">
-  </div>
-  <div class="mb-3">
-    <label for="password" class="form-label">Password</label>
-    <input type="password" class="form-control" id="cpassword" name="password">
-  </div>
-  <div class="mb-3">
-    <label for="cpassword" class="form-label">confirm Password</label>
-    <input type="password" class="form-control" id="cpassword" name="cpassword">
-  </div>
-  <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
-
-  <button type="submit" class="btn btn-primary" name="signup"> submit</button>
-
-</form>
+    <div class="container my-4">
+     <h1 class="text-center">Signup to our website</h1>
+     <form action="./signup.php" method="post">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" minlength="8" class="form-control" id="username" name="username" aria-describedby="emailHelp" >
+            
+        </div>
+        <div class="form-group">
+            <label for="password" >Password</label>
+            <input type="password" maxlength="23" class="form-control" id="password" placeholder="min 8 character" name="password">
+        </div>
+        <div class="form-group">
+            <label for="cpassword">Confirm Password</label>
+            <input type="password" class="form-control" id="cpassword" name="cpassword">
+            <small id="emailHelp" class="form-text text-muted">Make sure to type the same password</small>
+        </div>
+         
+        <button type="submit" class="btn btn-primary">SignUp</button>
+     </form>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js" integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.min.js" integrity="sha384-ODmDIVzN+pFdexxHEHFBQH3/9/vQ9uori45z4JjnFsRydbmQbmL5t1tQ0culUzyK" crossorigin="anonymous"></script>
-</body>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+  </body>
 </html>
